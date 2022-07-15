@@ -20,15 +20,37 @@ contract MetadriveFile is
     Counters.Counter private _tokenIdCounter;
 
     // For each tokenized file, store the encrypted symmetric key
-    mapping(int256 => mapping(address => bool)) public keys;
+    mapping(uint256 => mapping(address => bytes32)) public keys;
+
+    // Checks if the caller is the NFT owner
+    modifier callerIsOwner(uint256 tokenId) {
+        require(
+            msg.sender == ownerOf(tokenId),
+            "Caller does not own the token."
+        );
+        _;
+    }
 
     constructor() ERC721("MetadriveFile", "MDF") {}
 
-    function safeMint(string memory uri) public {
+    function safeMint(string memory uri, bytes32 key) public {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(msg.sender, tokenId);
         _setTokenURI(tokenId, uri);
+        keys[tokenId][msg.sender] = key;
+    }
+
+    function share(uint256 tokenId, address to) public callerIsOwner(tokenId) {
+        delete keys[tokenId][to];
+    }
+
+    function unshare(
+        uint256 tokenId,
+        address to,
+        bytes32 key
+    ) public callerIsOwner(tokenId) {
+        keys[tokenId][to] = key;
     }
 
     // The following functions are overrides required by Solidity.
