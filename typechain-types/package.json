@@ -1,0 +1,14 @@
+{
+  "name": "@metadrive/typechain-types",
+  "version": "0.1.1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p .",
+    "p": "yarn build && yarn publish --access public --patch --no-git-tag-version"
+  },
+  "files": [
+    "/dist"
+  ],
+  "author": "Sumit Ghosh <sumit@sumit-ghosh.com>"
+}

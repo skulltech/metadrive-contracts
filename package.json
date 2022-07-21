@@ -1,7 +1,5 @@
 {
-  "name": "metadrive",
-  "version": "1.0.0",
-  "main": "index.js",
+  "version": "0.1.0",
   "repository": "git@github.com:0xMetadrive/contracts.git",
   "author": "Sumit Ghosh <sumit@sumit-ghosh.com>",
   "license": "MIT",
