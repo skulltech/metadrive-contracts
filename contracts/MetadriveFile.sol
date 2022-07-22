@@ -20,7 +20,7 @@ contract MetadriveFile is
     Counters.Counter private _tokenIdCounter;
 
     // For each tokenized file, store the encrypted symmetric key
-    mapping(uint256 => mapping(address => bytes32)) public keys;
+    mapping(uint256 => mapping(address => string)) public keys;
 
     // Checks if the caller is the NFT owner
     modifier callerIsOwner(uint256 tokenId) {
@@ -33,7 +33,7 @@ contract MetadriveFile is
 
     constructor() ERC721("MetadriveFile", "MDF") {}
 
-    function safeMint(string memory uri, bytes32 key) public {
+    function safeMint(string memory uri, string memory key) public {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(msg.sender, tokenId);
@@ -48,7 +48,7 @@ contract MetadriveFile is
     function unshare(
         uint256 tokenId,
         address to,
-        bytes32 key
+        string memory key
     ) public callerIsOwner(tokenId) {
         keys[tokenId][to] = key;
     }
