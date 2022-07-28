@@ -1,6 +1,6 @@
 {
   "name": "@metadrive/typechain-types",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -8,7 +8,8 @@
     "p": "yarn build && yarn publish --access public --patch --no-git-tag-version"
   },
   "files": [
-    "/dist"
+    "dist",
+    "src"
   ],
   "author": "Sumit Ghosh <sumit@sumit-ghosh.com>"
 }
