@@ -25,49 +25,59 @@ contract MetadriveFile is
     // Store the public key for each registered address
     mapping(address => bytes32) public publicKeys;
 
-    // Checks if the address is registered
+    // Make sure that address is registered
     modifier isRegistered(address addr) {
-        require(publicKeys[addr].length > 0, "Address is not registered.");
+        require(publicKeys[addr] != 0, "Address is not registered.");
         _;
     }
 
-    // Checks if the address is not registred
-    modifier isNotRegistered(address addr) {
-        require(publicKeys[addr].length == 0, "Address is already registered.");
-        _;
-    }
-
-    // Checks if the address is the NFT owner
+    // Make sure that address is the NFT owner
     modifier isOwner(uint256 tokenId, address addr) {
         require(addr == ownerOf(tokenId), "Address does not own the file.");
         _;
     }
 
-    // Checks if the address is not the NFT owner
+    // Make sure that address is not the NFT owner
     modifier isNotOwner(uint256 tokenId, address addr) {
         require(addr != ownerOf(tokenId), "Address owns the file.");
         _;
     }
 
+    // Events
+    event Mint(uint256 tokenId, address to, string uri, string fileKey);
+    event Register(address addr, bytes32 publicKey);
+    event Share(uint256 tokenId, address to, string fileKey);
+    event Unshare(uint256 tokenId, address to);
+
     constructor() ERC721("MetadriveFile", "MDF") {}
 
-    function safeMint(string memory uri, string memory fileKey) public {
+    // Register an address
+    function register(bytes32 publicKey) public {
+        publicKeys[msg.sender] = publicKey;
+        emit Register({addr: msg.sender, publicKey: publicKey});
+    }
+
+    // Mint a Metadrive File NFT
+    function safeMint(string memory uri, string memory fileKey)
+        public
+        isRegistered(msg.sender)
+    {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(msg.sender, tokenId);
         _setTokenURI(tokenId, uri);
 
-        // Store the encrypted file key of this file for this user
         fileKeys[tokenId][msg.sender] = fileKey;
-    }
-
-    // Register an address
-    function register(bytes32 publicKey) public isNotRegistered(msg.sender) {
-        publicKeys[msg.sender] = publicKey;
+        emit Mint({
+            tokenId: tokenId,
+            to: msg.sender,
+            uri: uri,
+            fileKey: fileKey
+        });
     }
 
     // Share a file i.e. give read access to an address
-    function shareFile(
+    function share(
         uint256 tokenId,
         address to,
         string memory fileKey
@@ -78,10 +88,11 @@ contract MetadriveFile is
         isOwner(tokenId, msg.sender)
     {
         fileKeys[tokenId][to] = fileKey;
+        emit Share({tokenId: tokenId, to: to, fileKey: fileKey});
     }
 
     // Unshare a file i.e. revoke read access from an user
-    function unshareFile(uint256 tokenId, address to)
+    function unshare(uint256 tokenId, address to)
         public
         isRegistered(msg.sender)
         isRegistered(to)
@@ -89,6 +100,7 @@ contract MetadriveFile is
         isNotOwner(tokenId, to)
     {
         delete fileKeys[tokenId][to];
+        emit Unshare({tokenId: tokenId, to: to});
     }
 
     // The following functions are overrides required by Solidity.
