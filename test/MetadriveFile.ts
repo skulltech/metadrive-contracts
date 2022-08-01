@@ -36,7 +36,7 @@ describe("MetadriveFile", () => {
       const publicKey = randomBytes(32);
       await expect(metadriveFile.connect(otherAccount).register(publicKey))
         .to.emit(metadriveFile, "Register")
-        .withArgs(otherAccount.address, publicKey);
+        .withArgs(otherAccount.address, otherAccount.address, publicKey);
 
       // Ensure publicKey is set correctly after registering
       expect(await metadriveFile.publicKeys(otherAccount.address)).to.equal(
